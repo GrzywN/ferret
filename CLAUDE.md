@@ -10,7 +10,7 @@
 
 | Command | Purpose | Creates files? |
 |---------|---------|---------------|
-| `/ferret:plan` | Parallelization analysis – read-only report | No |
+| `/ferret:plan` | Numeric orchestration plan (`N` series, `N.M` parallel track) – read-only by default; `--apply-labels` opt-in writes labels to tracker titles | No (unless `--apply-labels`) |
 | `/ferret:start` | Begin session tracking | `data/sessions/*.json` |
 | `/ferret:pause` | Pause active session | updates session JSON |
 | `/ferret:resume` | Resume paused session | updates session JSON |
@@ -19,6 +19,19 @@
 | `/ferret:annotate` | Annotate last git commit + append NDJSON | `.ferret.ndjson` |
 | `/ferret:brag` | *(optional)* Generate XYZ doc | `output/` |
 | `/ferret:score` | Analytics & performance score | `output/reports/` |
+
+---
+
+## `/ferret:plan` numeric scheme
+
+Labels encode orchestration: `N` = sequential series (1 before 2), `N.M` = parallel
+track inside a series (`1.1` and `1.2` run simultaneously), `N.M.K` = subtask split
+(only for issues with dedicated subtasks, normally absent). Same first number = same
+wave; different second number = parallel.
+
+- Default run: read-only advice, no side effects.
+- `--apply-labels`: prefix tracker (Jira/Linear) issue titles with their label. Gated by
+  confirmation, idempotent (rewrites existing prefix, never stacks), supports `--dry-run`.
 
 ---
 
