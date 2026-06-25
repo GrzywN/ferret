@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# prepare-commit-msg – Auto-append Claude-Time trailer if a session is active
+#
+# OPTIONAL. Install in your project repo (not in this plugin):
+#   cp /path/to/agent-tracker/hooks/prepare-commit-msg .git/hooks/
+#   chmod +x .git/hooks/prepare-commit-msg
+#
+# Reads the first active session from data/sessions/ in the plugin directory.
+# Set FERRET_DIR env var to override the plugin path.
+
+COMMIT_MSG_FILE="$1"
+COMMIT_SOURCE="${2:-}"
+[ -n "$COMMIT_SOURCE" ] && exit 0   # Skip merges, amends, etc.
+
+AT_DIR="${FERRET_DIR:-$(dirname "$(realpath "$0")")/../..}"
+SESSION_DIR="$AT_DIR/data/sessions"
+[ -d "$SESSION_DIR" ] || exit 0
+
+ACTIVE=$(ls "$SESSION_DIR"/*.json 2>/dev/null | head -1)
+[ -z "$ACTIVE" ] && exit 0
+
+# Portable field extraction (no jq dependency)
+SESSION_ID=$(grep -o '"id":"[^"]*"'        "$ACTIVE" | head -1 | sed 's/.*"id":"//;s/".*//')
+TASK_ID=$(grep -o '"task_id":"[^"]*"'     "$ACTIVE" | head -1 | sed 's/.*"task_id":"//;s/".*//')
+ELAPSED=$(grep -o '"elapsed_seconds":[0-9]*' "$ACTIVE" | head -1 | sed 's/.*://')
+TOKENS=$(grep -o '"token_total":[0-9]*'   "$ACTIVE" | head -1 | sed 's/.*://')
+CONCURRENT=$(ls "$SESSION_DIR"/*.json 2>/dev/null | wc -l | tr -d ' ')
+
+HOURS=$((${ELAPSED:-0} / 3600))
+MINS=$(( (${ELAPSED:-0} % 3600) / 60 ))
+[ "$HOURS" -gt 0 ] && ELAPSED_FMT="${HOURS}h${MINS}min" || ELAPSED_FMT="${MINS}min"
+[ -z "$TOKENS" ] && TOKENS="0~"
+
+printf "\nClaude-Time: elapsed=%s tokens=%s session=%s concurrent=%s\n" \
+  "$ELAPSED_FMT" "$TOKENS" "${SESSION_ID:0:8}" "$CONCURRENT" \
+  >> "$COMMIT_MSG_FILE"

@@ -1,0 +1,8 @@
+{
+  "name": "ferret",
+  "description": "Ferret – local-first time tracking for AI coding agents. Parallel task analysis, session lifecycle, token metrics, git annotation, XYZ brag docs.",
+  "version": "0.1.0",
+  "author": { "name": "ferret contributors" },
+  "homepage": "https://github.com/your-org/ferret",
+  "license": "MIT"
+}

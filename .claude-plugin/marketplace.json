@@ -1,0 +1,10 @@
+{
+  "name": "ferret",
+  "plugins": [
+    {
+      "name": "ferret",
+      "description": "Ferret out how long things actually take.",
+      "source": { "source": "directory", "path": "." }
+    }
+  ]
+}

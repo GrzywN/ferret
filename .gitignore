@@ -1,0 +1,13 @@
+# Active sessions – local state, not committed
+data/sessions/
+
+# Completed sessions – commit if you want full history
+# data/completed/
+
+# NDJSON log – commit for git-native history
+# .ferret.ndjson
+
+# Secrets
+.env
+.env.local
+*.token
