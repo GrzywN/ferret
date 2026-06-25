@@ -7,6 +7,9 @@ data/sessions/
 # NDJSON log – commit for git-native history
 # .ferret.ndjson
 
+# Dependencies
+node_modules/
+
 # Secrets
 .env
 .env.local
